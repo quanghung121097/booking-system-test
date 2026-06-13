@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class IndexBookingsRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'user_name' => ['nullable', 'string', 'max:255'],
+            'from'      => ['nullable', 'date'],
+            'to'        => ['nullable', 'date', 'after_or_equal:from'],
+            'page'      => ['nullable', 'integer', 'min:1'],
+            'per_page'  => ['nullable', 'integer', 'min:1', 'max:50'],
+        ];
+    }
+}

@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+backend/vendor/
+
+# Environment — không commit file chứa secret
+.env
+.env.local
+.env.*.local
+backend/.env
+backend/.env.backup
+backend/.env.production
+frontend/.env
+frontend/.env.local
+frontend/.env.production
+
+# Giữ lại file mẫu (example)
+!.env.docker.example
+!backend/.env.example
+!frontend/.env.example
+
+# Build / cache
+frontend/dist/
+backend/public/hot
+backend/public/storage
+backend/storage/*.key
+
+# Logs & OS
+*.log
+.DS_Store
+Thumbs.db
+
+# IDE (tùy chọn — giữ repo sạch)
+.idea/
+.vscode/
+*.swp
