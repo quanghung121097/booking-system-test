@@ -1,4 +1,21 @@
-.PHONY: up down build install fresh logs shell-php shell-mysql migrate seed key optimize test
+.PHONY: setup up down build install fresh logs shell-php shell-mysql migrate seed key optimize test
+
+setup:      ## First-time setup (env + build + up + install + key + migrate + seed)
+	@test -f .env || cp .env.docker.example .env
+	@test -f backend/.env || cp .env.docker.example backend/.env
+	@test -f frontend/.env || cp frontend/.env.example frontend/.env
+	docker compose up -d --build
+	@echo "Đang chờ MySQL khởi động..."
+	@sleep 10
+	$(MAKE) install
+	@if ! grep -q '^APP_KEY=.\+' backend/.env; then $(MAKE) key; fi
+	$(MAKE) migrate
+	$(MAKE) seed
+	@echo ""
+	@echo "Setup xong."
+	@echo "  App:      http://localhost:8080"
+	@echo "  Email:    test@example.com"
+	@echo "  Mật khẩu: password"
 
 up:         ## Start all containers
 	docker compose up -d
@@ -14,8 +31,11 @@ install:    ## Install PHP dependencies (run after first make up)
 
 fresh:      ## Full reset: down + up + migrate + seed
 	docker compose down -v
-	docker compose up -d
-	sleep 5
+	docker compose up -d --build
+	@echo "Đang chờ MySQL khởi động..."
+	@sleep 10
+	$(MAKE) install
+	@if ! grep -q '^APP_KEY=.\+' backend/.env; then $(MAKE) key; fi
 	$(MAKE) migrate
 	$(MAKE) seed
 
@@ -35,7 +55,7 @@ seed:       ## Run seeders
 	docker compose exec php php artisan db:seed --force
 
 key:        ## Generate application key
-	docker compose exec php php artisan key:generate
+	docker compose exec php php artisan key:generate --force
 
 optimize:   ## Cache config / routes / views
 	docker compose exec php php artisan optimize

@@ -4,7 +4,7 @@
 
 ## Tài khoản demo
 
-Sau khi chạy `make seed` (hoặc `php artisan db:seed`), dùng thông tin sau để đăng nhập:
+Sau khi chạy `make setup` (hoặc `make seed`), dùng thông tin sau để đăng nhập:
 
 ```
 Email:    test@example.com
@@ -50,37 +50,33 @@ Sau khi copy, tự điền `DB_USERNAME`, `DB_PASSWORD`, `APP_KEY` (hoặc chạ
 
 ## Hướng dẫn cho người mới (sau khi pull code)
 
-Chọn **một** trong hai cách dưới đây. Khuyến nghị dùng **Docker** nếu bạn muốn setup nhanh, không cần cài PHP/MySQL/Node trên máy.
-
-### Bước 0 — Clone repository
+**Yêu cầu:** Docker ≥ 24.x, Docker Compose ≥ 2.x
 
 ```bash
 git clone <url-repo> booking-system
 cd booking-system
+make setup
 ```
 
-### Cách A — Chạy bằng Docker (khuyến nghị)
+Lệnh `make setup` tự động: copy file env mẫu → build & khởi động container → `composer install` → sinh `APP_KEY` → migrate → seed.
 
-**Yêu cầu:** Docker ≥ 24.x, Docker Compose ≥ 2.x
+Mở **http://localhost:8080** và đăng nhập bằng [tài khoản demo](#tài-khoản-demo).
+
+---
+
+Muốn chạy local không Docker? Xem [Cách B](#cách-b--chạy-local-không-dùng-docker) bên dưới.
+
+### Cách A — Docker (từng bước, tùy chọn)
+
+Nếu không dùng `make setup`, có thể chạy thủ công:
 
 ```bash
-# 1. Tạo file env (docker-compose + Laravel — dùng cùng mật khẩu DB)
 cp .env.docker.example .env
 cp .env.docker.example backend/.env
-# Tùy chọn: sửa DB_USERNAME / DB_PASSWORD / DB_ROOT_PASSWORD trong cả hai file
-
-# 2. Tạo file env cho React
 cp frontend/.env.example frontend/.env
-# frontend/.env mặc định: VITE_API_URL=http://localhost:8080/api
-
-# 3. Build và khởi động container
 make build
 make up
-
-# 4. Cài dependency PHP (volume mount ghi đè vendor trong image)
 make install
-
-# 5. Khởi tạo database và dữ liệu mẫu
 make key
 make migrate
 make seed
@@ -219,22 +215,24 @@ npm run dev
 ### Chạy lần đầu
 
 ```bash
+make setup
+```
+
+Hoặc từng bước:
+
+```bash
 # 1. Cấu hình biến môi trường
 cp .env.docker.example .env
 cp .env.docker.example backend/.env
 cp frontend/.env.example frontend/.env
 
-# 2. Build và khởi động tất cả container
+# 2. Build, khởi động và khởi tạo
 make build
 make up
-
-# 3. Cài dependency PHP
 make install
-
-# 4. Khởi tạo ứng dụng
-make key        # sinh APP_KEY cho Laravel
-make migrate    # chạy tất cả migration
-make seed       # tạo dữ liệu mẫu (tài khoản + 8 phòng + booking)
+make key
+make migrate
+make seed
 ```
 
 Truy cập: **http://localhost:8080**
@@ -260,6 +258,7 @@ make fresh      # down -v → up → migrate → seed chỉ 1 lệnh
 
 | Lệnh | Mô tả |
 |---|---|
+| `make setup` | **Lần đầu pull code** — env + build + up + install + key + migrate + seed |
 | `make up` | Khởi động tất cả container |
 | `make down` | Dừng tất cả container |
 | `make build` | Build lại image (--no-cache) |
