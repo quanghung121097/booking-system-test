@@ -77,7 +77,10 @@ cp frontend/.env.example frontend/.env
 make build
 make up
 
-# 4. Khởi tạo database và dữ liệu mẫu
+# 4. Cài dependency PHP (volume mount ghi đè vendor trong image)
+make install
+
+# 5. Khởi tạo database và dữ liệu mẫu
 make key
 make migrate
 make seed
@@ -202,7 +205,7 @@ npm run dev
 | URL API | http://localhost:8080/api | http://localhost:8000/api |
 | File env backend | `cp .env.docker.example .env` + `backend/.env` | `cp backend/.env.example backend/.env` |
 | File env frontend | `VITE_API_URL=http://localhost:8080/api` | `VITE_API_URL=http://localhost:8000/api` |
-| Lệnh migrate/seed | `make migrate` / `make seed` | `php artisan migrate` / `php artisan db:seed` |
+| Lệnh migrate/seed | `make install` → `make migrate` / `make seed` | `composer install` → `php artisan migrate` / `db:seed` |
 
 ---
 
@@ -225,7 +228,10 @@ cp frontend/.env.example frontend/.env
 make build
 make up
 
-# 3. Khởi tạo ứng dụng
+# 3. Cài dependency PHP
+make install
+
+# 4. Khởi tạo ứng dụng
 make key        # sinh APP_KEY cho Laravel
 make migrate    # chạy tất cả migration
 make seed       # tạo dữ liệu mẫu (tài khoản + 8 phòng + booking)
@@ -257,6 +263,7 @@ make fresh      # down -v → up → migrate → seed chỉ 1 lệnh
 | `make up` | Khởi động tất cả container |
 | `make down` | Dừng tất cả container |
 | `make build` | Build lại image (--no-cache) |
+| `make install` | Cài Composer dependency trong container PHP |
 | `make fresh` | Reset toàn bộ: down + up + migrate + seed |
 | `make logs` | Xem log realtime tất cả container |
 | `make shell-php` | Mở bash trong container PHP |

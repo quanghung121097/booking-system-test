@@ -1,4 +1,4 @@
-.PHONY: up down build fresh logs shell-php shell-mysql migrate seed key optimize test
+.PHONY: up down build install fresh logs shell-php shell-mysql migrate seed key optimize test
 
 up:         ## Start all containers
 	docker compose up -d
@@ -8,6 +8,9 @@ down:       ## Stop all containers
 
 build:      ## Rebuild all images (no cache)
 	docker compose build --no-cache
+
+install:    ## Install PHP dependencies (run after first make up)
+	docker compose exec php composer install --prefer-dist
 
 fresh:      ## Full reset: down + up + migrate + seed
 	docker compose down -v
